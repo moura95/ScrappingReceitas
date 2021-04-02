@@ -6,11 +6,9 @@ buscar = str(input("Digite algum ingrediente: "))
 
 base_url = "https://www.tudogostoso.com.br"
 url = f"https://www.tudogostoso.com.br/busca?q={buscar}"
-urlreceita = "https://www.tudogostoso.com.br/receita/1534-file-a-parmegiana.html"
 
 
 html = requests.get(url).text
-# html = requests.get(urlreceita).text
 soup = BeautifulSoup(html, "html.parser")
 
 
