@@ -1,21 +1,47 @@
-from os import replace
-import re
 import requests
 from bs4 import BeautifulSoup
-import pprint
-pagAtual = 1
-ingrediente = str(input("Digite os ingredientes separados por espaço: "))
-url = "https://www.tudogostoso.com.br/busca?page="+str(pagAtual)+"&q="+str(ingrediente.replace(" ", "+"))
-recipe_urls = []
+from pprint import pprint
 
-def main(url,ingrediente, pagAtual):
-    htmlResponse = requests.get(url)
-    soup = BeautifulSoup(htmlResponse.text, 'html.parser')
-    container = soup.findAll("div", {"class": "mb-3 recipe-card recipe-card-with-hover"})
-    #recipe_urls = []
-    for r in container:
-        link = "https://www.tudogostoso.com.br"+r.a['href']
-        recipe_urls.append(link)
-        print(link)
+buscar = str(input("Digite algum ingrediente: "))
 
-main(url,ingrediente,pagAtual)
+base_url = "https://www.tudogostoso.com.br"
+url = f"https://www.tudogostoso.com.br/busca?q={buscar}"
+urlreceita = "https://www.tudogostoso.com.br/receita/1534-file-a-parmegiana.html"
+
+
+html = requests.get(url).text
+# html = requests.get(urlreceita).text
+soup = BeautifulSoup(html, "html.parser")
+
+
+def get_links(url):
+    links = []
+
+    links_rec = soup.findAll("a", {"class": "link row m-0"})
+    for link in links_rec:
+        link = f"{base_url}{link['href']}"
+        links.append(link)
+    return links
+
+
+def get_ingredientes(urlreceita):
+    html = requests.get(urlreceita).text
+    soup = BeautifulSoup(html, "html.parser")
+    list_ingrediente = "\n"
+    title = soup.h1.text
+    ingredientes = soup.findAll("span", {"class": "p-ingredient"})
+    ingredientes = map(lambda i: i.text, ingredientes)
+    ingredientes = list_ingrediente.join(ingredientes)
+    link = urlreceita
+    return link, title, ingredientes
+
+
+def main():
+    links = get_links(url)
+    for link in links:
+        link, title, ingredientes = get_ingredientes(link)
+        print(f"{title}\n{ingredientes}\n {link}")
+        print("------------------------------------")
+
+
+main()
